@@ -39,18 +39,12 @@
             初始化
             </summary>
         </member>
-        <member name="M:JM.ThreadCompl.JMThreadManager.RunThread(System.Action,System.Action)">
+        <member name="M:JM.ThreadCompl.JMThreadManager.RunThread(System.Action)">
             <summary>
             运行线程
             </summary>
             <param name="threadAct">线程方法</param>
-            <param name="onThreadCompletedCallback">线程完成回调</param>
             <returns>线程唯一标识Id</returns>
-        </member>
-        <member name="M:JM.ThreadCompl.JMThreadManager.GetThreadStatus(System.String)">
-            <summary>
-            获取线程状态
-            </summary>
         </member>
         <member name="M:JM.ThreadCompl.JMThreadManager.AbortThread(System.String)">
             <summary>
@@ -60,26 +54,6 @@
         <member name="M:JM.ThreadCompl.JMThreadManager.DoRelease">
             <summary>
             注销
-            </summary>
-        </member>
-        <member name="T:JM.ThreadCompl.ThreadStatus">
-            <summary>
-            线程状态
-            </summary>
-        </member>
-        <member name="F:JM.ThreadCompl.ThreadStatus.Wait">
-            <summary>
-            等待
-            </summary>
-        </member>
-        <member name="F:JM.ThreadCompl.ThreadStatus.Run">
-            <summary>
-            运行
-            </summary>
-        </member>
-        <member name="F:JM.ThreadCompl.ThreadStatus.DoneOrNotExists">
-            <summary>
-            结束或者不存在
             </summary>
         </member>
         <member name="F:JM.ThreadCompl.JMThreadPool._maxCount">
@@ -107,17 +81,12 @@
             等待线程列表锁
             </summary>
         </member>
-        <member name="M:JM.ThreadCompl.JMThreadPool.CreateThread(System.Action,System.Action,System.Action{System.String})">
+        <member name="M:JM.ThreadCompl.JMThreadPool.CreateThread(System.Action,System.Action{System.String})">
             <summary>
             创建线程
             </summary>
         </member>
-        <member name="M:JM.ThreadCompl.JMThreadPool.GetThreadStatus(System.String)">
-            <summary>
-            获取线程状态
-            </summary>
-        </member>
-        <member name="M:JM.ThreadCompl.JMThreadPool.DestroyThread(System.String,System.Action{System.String})">
+        <member name="M:JM.ThreadCompl.JMThreadPool.AbortThread(System.String,System.Action{System.String})">
             <summary>
             销毁线程
             </summary>
@@ -127,7 +96,7 @@
             销毁
             </summary>
         </member>
-        <member name="M:JM.ThreadCompl.JMThreadPool.OnRunThreadCompleted">
+        <member name="M:JM.ThreadCompl.JMThreadPool.OnRunThreadCompleted(System.Action{System.String})">
             <summary>
             线程运行结束处理
             </summary>
@@ -147,11 +116,6 @@
         <member name="M:JM.ThreadCompl.JMThreadPool.GetWaitThreadById(System.String)">
             <summary>
             通过线程唯一标识Id获取等待线程实例
-            </summary>
-        </member>
-        <member name="M:JM.ThreadCompl.JMThreadPool.GetThreadById(System.String)">
-            <summary>
-            通过线程唯一标识Id获取线程实例
             </summary>
         </member>
     </members>

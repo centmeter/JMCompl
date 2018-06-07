@@ -55,7 +55,7 @@ namespace JM.ThreadCompl
         /// <summary>
         /// 创建线程
         /// </summary>
-        internal string CreateThread(Action threadAct, Action onThreadCompletedCallback = null, Action<string> onThreadExceptionCallback = null)
+        internal string CreateThread(Action threadAct, Action<string> onThreadExceptionCallback = null)
         {
             string threadId = string.Format("JMThread_{0}", Guid.NewGuid());
             Thread thread = new Thread(new ThreadStart(() =>
@@ -66,11 +66,13 @@ namespace JM.ThreadCompl
                     {
                         threadAct.Invoke();
                     }
-                    if (onThreadCompletedCallback != null)
+                    OnRunThreadCompleted((error)=> 
                     {
-                        onThreadCompletedCallback.Invoke();
-                    }
-                    OnRunThreadCompleted();
+                        if(onThreadExceptionCallback!=null)
+                        {
+                            onThreadExceptionCallback.Invoke(error);
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -104,33 +106,9 @@ namespace JM.ThreadCompl
         }
 
         /// <summary>
-        /// 获取线程状态
-        /// </summary>
-        internal ThreadStatus GetThreadStatus(string threadId)
-        {
-            ThreadStatus status = ThreadStatus.DoneOrNotExists;
-
-            Thread thread = GetRunThreadById(threadId);
-            if (thread != null)
-            {
-                status = ThreadStatus.Run;
-            }
-            else
-            {
-                thread = GetWaitThreadById(threadId);
-                if (thread != null)
-                {
-                    status = ThreadStatus.Wait;
-                }
-            }
-            return status;
-
-        }
-
-        /// <summary>
         /// 销毁线程
         /// </summary>
-        internal void DestroyThread(string threadId, Action<string> onDestroyThreadFailCallback = null)
+        internal void AbortThread(string threadId, Action<string> onDestroyThreadFailCallback = null)
         {
             Thread thread = GetRunThreadById(threadId);
             if (thread != null)
@@ -203,17 +181,26 @@ namespace JM.ThreadCompl
         /// <summary>
         /// 线程运行结束处理
         /// </summary>
-        private void OnRunThreadCompleted()
+        private void OnRunThreadCompleted(Action<string> onExceptionCallback = null)
         {
             Thread thread = Thread.CurrentThread;
-            if (_runList.Contains(thread))
+            if (thread != null && _runList.Contains(thread))
             {
                 lock (_runListLocker)
                 {
                     _runList.Remove(thread);
                 }
+                RunWaitThread();
             }
-            RunWaitThread();
+            else
+            {
+                if (onExceptionCallback != null)
+                {
+                    string arg = string.Format("## JM Error ## cls:JMThreadPool func:OnRunThreadCompleted info:Completed thread is null or not exists");
+                    onExceptionCallback.Invoke(arg);
+                }
+            }
+
         }
 
         /// <summary>
@@ -268,19 +255,6 @@ namespace JM.ThreadCompl
                     thread = _waitList[i];
                     break;
                 }
-            }
-            return thread;
-        }
-
-        /// <summary>
-        /// 通过线程唯一标识Id获取线程实例
-        /// </summary>
-        private Thread GetThreadById(string threadId)
-        {
-            Thread thread = GetRunThreadById(threadId);
-            if (thread == null)
-            {
-                thread = GetWaitThreadById(threadId);
             }
             return thread;
         }

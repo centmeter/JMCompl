@@ -51,7 +51,7 @@ namespace JM.ThreadCompl
         private JMThreadPool _threadPool;
 
         #endregion
-        
+
         #region Event
 
         /// <summary>
@@ -96,14 +96,13 @@ namespace JM.ThreadCompl
         /// 运行线程
         /// </summary>
         /// <param name="threadAct">线程方法</param>
-        /// <param name="onThreadCompletedCallback">线程完成回调</param>
         /// <returns>线程唯一标识Id</returns>
-        public string RunThread(Action threadAct, Action onThreadCompletedCallback = null)
+        public string RunThread(Action threadAct)
         {
             string id = string.Empty;
             if (_initDone)
             {
-                id = _threadPool.CreateThread(threadAct, onThreadCompletedCallback, (error) =>
+                id = _threadPool.CreateThread(threadAct, (error) =>
                 {
                     if (OnExceptionEvent != null)
                     {
@@ -115,28 +114,15 @@ namespace JM.ThreadCompl
         }
 
         /// <summary>
-        /// 获取线程状态
-        /// </summary>
-        public ThreadStatus GetThreadStatus(string threadId)
-        {
-            ThreadStatus status = ThreadStatus.DoneOrNotExists;
-            if (_initDone)
-            {
-                status = _threadPool.GetThreadStatus(threadId);
-            }
-            return status;
-        }
-
-        /// <summary>
         /// 强制结束线程
         /// </summary>
         public void AbortThread(string threadId)
         {
-            if(_initDone)
+            if (_initDone)
             {
-                _threadPool.DestroyThread(threadId, (error) =>
+                _threadPool.AbortThread(threadId, (error) =>
                  {
-                     if(OnExceptionEvent!=null)
+                     if (OnExceptionEvent != null)
                      {
                          OnExceptionEvent.Invoke(error);
                      }
@@ -149,7 +135,7 @@ namespace JM.ThreadCompl
         /// </summary>
         public void DoRelease()
         {
-            if(_initDone)
+            if (_initDone)
             {
                 OnExceptionEvent = null;
                 OnInitSuccessEvent = null;
@@ -159,26 +145,4 @@ namespace JM.ThreadCompl
         #endregion
     }
 
-    #region Enum
-
-    /// <summary>
-    /// 线程状态
-    /// </summary>
-    public enum ThreadStatus
-    {
-        /// <summary>
-        /// 等待
-        /// </summary>
-        Wait,
-        /// <summary>
-        /// 运行
-        /// </summary>
-        Run,
-        /// <summary>
-        /// 结束或者不存在
-        /// </summary>
-        DoneOrNotExists
-
-    }
-    #endregion
 }
