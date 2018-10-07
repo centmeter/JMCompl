@@ -1,17 +1,17 @@
-﻿using System;
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEditor;
+
 namespace JMEditor.UISearcher
 {
     public class JMUISeacher
     {
-        #region Public Func
+        #region ItemMenu Func
 
         /// <summary>
         /// 查询UI节点路径(复制到剪切板) 相对UI根节点(不包括根节点)
         /// </summary>
-        [MenuItem("GameObject/JMEditor/UISearcher(UIRoot)", false, 11)]
-        public static void SearchByRoot()
+        [MenuItem("GameObject/JMEditor/UISearcher(UIRoot) #R", false, 11)]
+        private static void SearchByRoot()
         {
             string path = Search();
             CutString("/", 2, ref path);
@@ -29,8 +29,8 @@ namespace JMEditor.UISearcher
         /// <summary>
         /// 查询UI节点路径(复制到剪切板) 相对Canvas节点(包括Canvas节点)
         /// </summary>
-        [MenuItem("GameObject/JMEditor/UISearcher(Canvas)", false, 11)]
-        public static void SearchByCanvas()
+        [MenuItem("GameObject/JMEditor/UISearcher(Canvas) #C", false, 11)]
+        private static void SearchByCanvas()
         {
             string path = Search();
             if (!string.IsNullOrEmpty(path))
