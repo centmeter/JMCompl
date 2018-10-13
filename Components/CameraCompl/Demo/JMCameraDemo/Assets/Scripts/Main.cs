@@ -49,31 +49,39 @@ public class Main : MonoBehaviour
             }
         }
 
-        if(GUILayout.Button("关闭摄像头"))
+        if (GUILayout.Button("关闭摄像头"))
         {
-            if(_camera!=null)
+            if (_camera != null)
             {
                 _camera.Close();
             }
         }
 
-        if(GUILayout.Button("重连摄像头"))
+        if (GUILayout.Button("重连摄像头"))
         {
-            if(_camera!=null)
+            if (_camera != null)
             {
-                _camera.ReConnect();
+                _camera.ReConnect(1080, 720);
             }
         }
 
         if (GUILayout.Button("拍照"))
         {
-            if(_camera!=null)
+            if (_camera != null)
             {
-                _camera.Snapshot((tex)=>
+                _camera.Snapshot((tex) =>
                 {
                     _imgSnapshot.texture = tex;
+                    
                 });
             }
+        }
+
+        if(GUILayout.Button("TEST"))
+        {
+            _camera.CameraTexture.deviceName = "1";
+
+            Debug.Log(_camera.CameraTexture.isPlaying);
         }
 
         GUILayout.EndVertical();

@@ -23,9 +23,20 @@ namespace JM.Camera
         #region Property
 
         /// <summary>
+        /// 摄像头标识ID
+        /// </summary>
+        public int CamId
+        {
+            get
+            {
+                return _camId;
+            }
+        }
+
+        /// <summary>
         /// 有效性
         /// </summary>
-        private bool IsValid
+        public bool IsValid
         {
             get
             {
@@ -39,40 +50,12 @@ namespace JM.Camera
                 }
                 else
                 {
-                    Debug.LogWarningFormat("## JM Warning ## Cls:JMCamera Func:IsValid CamId:{0} Info:Invalid", _camId);
+                    Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:IsValid CamId:{0} Info:Invalid", _camId);
                 }
 
                 return res;
             }
-        }
 
-        /// <summary>
-        /// 设备名字
-        /// </summary>
-        private string DeviceName
-        {
-            get
-            {
-                string res = string.Empty;
-
-                if (IsValid)
-                {
-                    res = WebCamTexture.devices[_camId].name;
-                }
-
-                return res;
-            }
-        }
-
-        /// <summary>
-        /// 摄像头标识ID
-        /// </summary>
-        public int CamId
-        {
-            get
-            {
-                return _camId;
-            }
         }
 
         /// <summary>
@@ -94,59 +77,46 @@ namespace JM.Camera
         {
             _camId = camId;
 
-            _camTex = new WebCamTexture(DeviceName);
+            _camTex = new WebCamTexture();
         }
 
         /// <summary>
         /// 打开
         /// </summary>
-        public void Open()
+        public void Open(int resolutionX = 1920, int resolutionY = 1080, int fps = 30)
         {
             if (!IsValid)
             {
                 return;
             }
 
-            if (_camTex != null)
+            try
             {
-                if (!_camTex.isPlaying)
+                if (_camTex != null)
                 {
-                    _camTex.Play();
-                }
-                else
-                {
-                    Debug.LogWarningFormat("## JM Warning ## Cls:JMCamera Func:Open CamId:{0} Info:Has opened", _camId);
+                    if (!_camTex.isPlaying)
+                    {
+                        _camTex.requestedWidth = resolutionX;
+
+                        _camTex.requestedHeight = resolutionY;
+
+                        _camTex.requestedFPS = fps;
+
+                        _camTex.deviceName = WebCamTexture.devices[_camId].name;
+
+                        _camTex.Play();
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("## JM Warning ## Cls:JMCamera Func:Open CamId:{0} Info:Has opened", _camId);
+                    }
                 }
             }
-        }
-
-        /// <summary>
-        /// 打开
-        /// </summary>
-        public void Open(int resolutionX, int resolutionY, int fps = 30)
-        {
-            if (!IsValid)
+            catch (Exception e)
             {
-                return;
+                Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Open CamId:{0} Info:{1}", _camId, e);
             }
 
-            if (_camTex != null)
-            {
-                if (!_camTex.isPlaying)
-                {
-                    _camTex.requestedWidth = resolutionX;
-
-                    _camTex.requestedHeight = resolutionY;
-
-                    _camTex.requestedFPS = fps;
-
-                    _camTex.Play();
-                }
-                else
-                {
-                    Debug.LogWarningFormat("## JM Warning ## Cls:JMCamera Func:Open CamId:{0} Info:Has opened", _camId);
-                }
-            }
         }
 
         /// <summary>
@@ -154,21 +124,23 @@ namespace JM.Camera
         /// </summary>
         public void Close()
         {
-            if (!IsValid)
+            try
             {
-                return;
+                if (_camTex != null)
+                {
+                    if (_camTex.isPlaying)
+                    {
+                        _camTex.Stop();
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("## JM Warning ## Cls:JMCamera Func:Close CamId:{0} Info:Has closed", _camId);
+                    }
+                }
             }
-
-            if (_camTex != null)
+            catch (Exception e)
             {
-                if (_camTex.isPlaying)
-                {
-                    _camTex.Stop();
-                }
-                else
-                {
-                    Debug.LogWarningFormat("## JM Warning ## Cls:JMCamera Func:Close CamId:{0} Info:Has closed", _camId);
-                }
+                Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Close CamId:{0} Info:{1}", _camId, e);
             }
         }
 
@@ -182,21 +154,31 @@ namespace JM.Camera
                 return;
             }
 
-            if (_camTex != null)
+            try
             {
-                if (_camTex.isPlaying)
+                if (_camTex != null)
                 {
-                    _camTex.Stop();
+                    if (_camTex.isPlaying)
+                    {
+                        _camTex.Stop();
+                    }
+
+                    _camTex.requestedWidth = resolutionX;
+
+                    _camTex.requestedHeight = resolutionY;
+
+                    _camTex.requestedFPS = fps;
+
+                    _camTex.deviceName = WebCamTexture.devices[_camId].name;
+
+                    _camTex.Play();
                 }
-
-                _camTex.requestedWidth = resolutionX;
-
-                _camTex.requestedHeight = resolutionY;
-
-                _camTex.requestedFPS = fps;
-
-                _camTex.Play();
             }
+            catch (Exception e)
+            {
+                Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:ReConnect CamId:{0} Info:{1}", _camId, e);
+            }
+
         }
 
         /// <summary>
@@ -206,22 +188,29 @@ namespace JM.Camera
         {
             Texture2D res = null;
 
-            if (_camTex != null)
+            try
             {
-                if (_camTex.isPlaying)
+                if (_camTex != null)
                 {
-                    Color[] colors = _camTex.GetPixels();
+                    if (_camTex.isPlaying)
+                    {
+                        Color[] colors = _camTex.GetPixels();
 
-                    res = new Texture2D(_camTex.width, _camTex.height);
+                        res = new Texture2D(_camTex.width, _camTex.height);
 
-                    res.SetPixels(colors);
+                        res.SetPixels(colors);
 
-                    res.Apply();
+                        res.Apply();
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:Camera not open", _camId);
+                    }
                 }
-                else
-                {
-                    Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:Camera not open", _camId);
-                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:{1}", _camId, e);
             }
 
             if (callback != null)
@@ -237,16 +226,23 @@ namespace JM.Camera
         {
             Color[] res = null;
 
-            if (_camTex != null)
+            try
             {
-                if (_camTex.isPlaying)
+                if (_camTex != null)
                 {
-                    res = _camTex.GetPixels();
+                    if (_camTex.isPlaying)
+                    {
+                        res = _camTex.GetPixels();
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:Camera not open", _camId);
+                    }
                 }
-                else
-                {
-                    Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:Camera not open", _camId);
-                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:{1}", _camId, e);
             }
 
             if (callback != null)
@@ -263,16 +259,23 @@ namespace JM.Camera
         {
             Color32[] res = null;
 
-            if (_camTex != null)
+            try
             {
-                if (_camTex.isPlaying)
+                if (_camTex != null)
                 {
-                    res = _camTex.GetPixels32();
+                    if (_camTex.isPlaying)
+                    {
+                        res = _camTex.GetPixels32();
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:Camera not open", _camId);
+                    }
                 }
-                else
-                {
-                    Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:Camera not open", _camId);
-                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogErrorFormat("## JM Error ## Cls:JMCamera Func:Snapshot CamId:{0} Info:{1}", _camId, e);
             }
 
             if (callback != null)
