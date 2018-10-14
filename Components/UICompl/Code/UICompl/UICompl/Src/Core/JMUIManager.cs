@@ -125,6 +125,8 @@ namespace JM.UICompl
                     throw new Exception(string.Format("## Uni Exception ## Author:<Ming> Cls:JMUIManager Func:UIEnter Exception:[{0}] uiObj is null", typeof(T).ToString()));
                 }
             }
+
+            return t;
         }
 
         #endregion

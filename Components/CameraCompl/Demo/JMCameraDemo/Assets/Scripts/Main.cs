@@ -1,4 +1,8 @@
 ﻿using JM.Camera;
+using JM.Image;
+using System;
+using System.Drawing;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,7 +49,7 @@ public class Main : MonoBehaviour
 
             if (_camera != null)
             {
-                _camera.Open(800,600);
+                _camera.Open((int)_img.rectTransform.rect.width, (int)_img.rectTransform.rect.height);
 
                 Debug.Log(_camera.CamInfo);
             }
@@ -63,18 +67,44 @@ public class Main : MonoBehaviour
         {
             if (_camera != null)
             {
-                _camera.ReConnect(1280, 720);
+                _camera.ReConnect((int)_img.rectTransform.rect.width, (int)_img.rectTransform.rect.height);
             }
         }
 
         if (GUILayout.Button("拍照"))
         {
+
             if (_camera != null)
             {
                 _camera.Snapshot((tex) =>
                 {
                     _imgSnapshot.texture = tex;
-                    
+
+                    byte[] pngData = tex.EncodeToPNG();
+
+                    string originPath = @"D:\1.png";
+
+                    string outputPath1 = @"D:\2.png";
+
+                    string outputPath2 = @"D:\3.png";
+
+                    File.WriteAllBytes(originPath, pngData);
+
+                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
+                    sw.Start();
+
+                    using (JMImageProcessor imageProcessor = new JMImageProcessor(originPath))
+                    {
+                        imageProcessor.NegativeEffect(outputPath1, System.Drawing.Imaging.ImageFormat.Png, (res) => { Debug.Log(res+" 1"); });
+
+                        imageProcessor.ReliefEffect(outputPath2, System.Drawing.Imaging.ImageFormat.Png, (res) => { Debug.Log(res+" 2"); });
+                    }
+
+                    sw.Stop();
+
+                    Debug.Log(sw.ElapsedMilliseconds);
+
                 });
             }
         }
