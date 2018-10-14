@@ -23,17 +23,6 @@ namespace JM.Camera
         #region Property
 
         /// <summary>
-        /// 摄像头标识ID
-        /// </summary>
-        public int CamId
-        {
-            get
-            {
-                return _camId;
-            }
-        }
-
-        /// <summary>
         /// 有效性
         /// </summary>
         public bool IsValid
@@ -44,7 +33,7 @@ namespace JM.Camera
 
                 WebCamDevice[] devices = WebCamTexture.devices;
 
-                if (devices != null && _camId >= 0 && _camId < devices.Length)
+                if (IndexValid(devices, _camId))
                 {
                     res = true;
                 }
@@ -61,11 +50,80 @@ namespace JM.Camera
         /// <summary>
         /// 摄像头纹理
         /// </summary>
-        public WebCamTexture CameraTexture
+        public Texture CameraTexture
         {
             get
             {
                 return _camTex;
+            }
+        }
+
+        /// <summary>
+        /// 摄像头标识ID
+        /// </summary>
+        public int CamId
+        {
+            get
+            {
+                return _camId;
+            }
+        }
+
+        /// <summary>
+        /// 设备名
+        /// </summary>
+        public string DeviceName
+        {
+            get
+            {
+                WebCamDevice[] devices = WebCamTexture.devices;
+
+                WebCamDevice device = default(WebCamDevice);
+
+                TryGetValue(devices, _camId, ref device);
+
+                return device.name;
+            }
+        }
+
+        /// <summary>
+        /// 摄像头基本信息
+        /// </summary>
+        public JMCamInfo CamInfo
+        {
+            get
+            {
+                JMCamInfo res = default(JMCamInfo);
+
+                if (_camTex != null)
+                {
+                    res.width = _camTex.width;
+
+                    res.height = _camTex.height;
+
+                    res.fps = _camTex.requestedFPS;
+                }
+
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// 摄像头开启标识
+        /// </summary>
+        /// <returns></returns>
+        public bool IsPlaying
+        {
+            get
+            {
+                bool res = false;
+
+                if (_camTex != null)
+                {
+                    res = _camTex.isPlaying;
+                }
+
+                return res;
             }
         }
 
@@ -83,7 +141,7 @@ namespace JM.Camera
         /// <summary>
         /// 打开
         /// </summary>
-        public void Open(int resolutionX = 1920, int resolutionY = 1080, int fps = 30)
+        public void Open(int resolutionX, int resolutionY, int fps = 30)
         {
             if (!IsValid)
             {
@@ -102,7 +160,7 @@ namespace JM.Camera
 
                         _camTex.requestedFPS = fps;
 
-                        _camTex.deviceName = WebCamTexture.devices[_camId].name;
+                        _camTex.deviceName = DeviceName;
 
                         _camTex.Play();
                     }
@@ -147,7 +205,7 @@ namespace JM.Camera
         /// <summary>
         /// 重连
         /// </summary>
-        public void ReConnect(int resolutionX = 1920, int resolutionY = 1080, int fps = 30)
+        public void ReConnect(int resolutionX, int resolutionY, int fps = 30)
         {
             if (!IsValid)
             {
@@ -169,7 +227,7 @@ namespace JM.Camera
 
                     _camTex.requestedFPS = fps;
 
-                    _camTex.deviceName = WebCamTexture.devices[_camId].name;
+                    _camTex.deviceName = DeviceName;
 
                     _camTex.Play();
                 }
@@ -286,6 +344,65 @@ namespace JM.Camera
 
         #endregion
 
+        #region Private Func
+
+        /// <summary>
+        /// 从数组中获取值
+        /// </summary>
+        private void TryGetValue<T>(T[] array, int index, ref T value)
+        {
+            if (IndexValid(array, index))
+            {
+                value = array[index];
+            }
+        }
+
+        /// <summary>
+        /// 数组取值有效性
+        /// </summary>
+        private bool IndexValid(Array array, int index)
+        {
+            bool res = false;
+
+            if (array != null && index >= 0 && index < array.Length)
+            {
+                res = true;
+            }
+
+            return res;
+        }
+
+        #endregion
+
+        #region Struct
+
+        /// <summary>
+        /// 摄像头信息
+        /// </summary>
+        public struct JMCamInfo
+        {
+            /// <summary>
+            /// 宽
+            /// </summary>
+            public int width;
+
+            /// <summary>
+            /// 高
+            /// </summary>
+            public int height;
+
+            /// <summary>
+            /// FPS
+            /// </summary>
+            public float fps;
+
+            public override string ToString()
+            {
+                return string.Format("width:{0} height:{1} fps:{2}", width, height, fps);
+            }
+        }
+
+        #endregion
     }
 }
 

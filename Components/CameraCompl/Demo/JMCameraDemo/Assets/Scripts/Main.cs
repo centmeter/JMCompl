@@ -45,7 +45,9 @@ public class Main : MonoBehaviour
 
             if (_camera != null)
             {
-                _camera.Open();
+                _camera.Open(800,600);
+
+                Debug.Log(_camera.CamInfo);
             }
         }
 
@@ -61,7 +63,7 @@ public class Main : MonoBehaviour
         {
             if (_camera != null)
             {
-                _camera.ReConnect(1080, 720);
+                _camera.ReConnect(1280, 720);
             }
         }
 
@@ -75,13 +77,6 @@ public class Main : MonoBehaviour
                     
                 });
             }
-        }
-
-        if(GUILayout.Button("TEST"))
-        {
-            _camera.CameraTexture.deviceName = "1";
-
-            Debug.Log(_camera.CameraTexture.isPlaying);
         }
 
         GUILayout.EndVertical();
