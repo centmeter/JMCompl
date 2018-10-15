@@ -76,32 +76,69 @@ namespace JM.Camera
         {
             get
             {
-                WebCamDevice[] devices = WebCamTexture.devices;
-
-                WebCamDevice device = default(WebCamDevice);
-
-                TryGetValue(devices, _camId, ref device);
-
-                return device.name;
+                return GetDevice().name;
             }
         }
 
         /// <summary>
-        /// 摄像头基本信息
+        /// 前置摄像头标识
         /// </summary>
-        public JMCamInfo CamInfo
+        public bool IsFrontFacing
         {
             get
             {
-                JMCamInfo res = default(JMCamInfo);
+                return GetDevice().isFrontFacing;
+            }
+        }
+
+        /// <summary>
+        /// 宽
+        /// </summary>
+        public int Width
+        {
+            get
+            {
+                int res = 0;
 
                 if (_camTex != null)
                 {
-                    res.width = _camTex.width;
+                    res = _camTex.width;
+                }
 
-                    res.height = _camTex.height;
+                return res;
+            }
+        }
 
-                    res.fps = _camTex.requestedFPS;
+        /// <summary>
+        /// 高
+        /// </summary>
+        public int Height
+        {
+            get
+            {
+                int res = 0;
+
+                if (_camTex != null)
+                {
+                    res = _camTex.height;
+                }
+
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// FPS
+        /// </summary>
+        public float FPS
+        {
+            get
+            {
+                float res = 0;
+
+                if (_camTex != null)
+                {
+                    res = _camTex.requestedFPS;
                 }
 
                 return res;
@@ -141,7 +178,7 @@ namespace JM.Camera
         /// <summary>
         /// 打开
         /// </summary>
-        public void Open(int resolutionX, int resolutionY, int fps = 30)
+        public void Open(int width, int height, float fps = 30)
         {
             if (!IsValid)
             {
@@ -154,9 +191,9 @@ namespace JM.Camera
                 {
                     if (!_camTex.isPlaying)
                     {
-                        _camTex.requestedWidth = resolutionX;
+                        _camTex.requestedWidth = width;
 
-                        _camTex.requestedHeight = resolutionY;
+                        _camTex.requestedHeight = height;
 
                         _camTex.requestedFPS = fps;
 
@@ -205,7 +242,7 @@ namespace JM.Camera
         /// <summary>
         /// 重连
         /// </summary>
-        public void ReConnect(int resolutionX, int resolutionY, int fps = 30)
+        public void ReConnect(int width, int height, float fps = 30)
         {
             if (!IsValid)
             {
@@ -221,9 +258,9 @@ namespace JM.Camera
                         _camTex.Stop();
                     }
 
-                    _camTex.requestedWidth = resolutionX;
+                    _camTex.requestedWidth = width;
 
-                    _camTex.requestedHeight = resolutionY;
+                    _camTex.requestedHeight = height;
 
                     _camTex.requestedFPS = fps;
 
@@ -342,6 +379,11 @@ namespace JM.Camera
             }
         }
 
+        public override string ToString()
+        {
+            return string.Format("CamId:{0} Divice:{1} IsFrontFacing:{2} Width:{3} Height:{4} FPS:{5} IsPlaying:{6}", CamId, DeviceName, IsFrontFacing, Width, Height, FPS, IsPlaying);
+        }
+
         #endregion
 
         #region Private Func
@@ -372,34 +414,18 @@ namespace JM.Camera
             return res;
         }
 
-        #endregion
-
-        #region Struct
-
         /// <summary>
-        /// 摄像头信息
+        /// 获取设备
         /// </summary>
-        public struct JMCamInfo
+        private WebCamDevice GetDevice()
         {
-            /// <summary>
-            /// 宽
-            /// </summary>
-            public int width;
+            WebCamDevice res = default(WebCamDevice);
 
-            /// <summary>
-            /// 高
-            /// </summary>
-            public int height;
+            WebCamDevice[] devices = WebCamTexture.devices;
 
-            /// <summary>
-            /// FPS
-            /// </summary>
-            public float fps;
+            TryGetValue(devices, _camId, ref res);
 
-            public override string ToString()
-            {
-                return string.Format("width:{0} height:{1} fps:{2}", width, height, fps);
-            }
+            return res;
         }
 
         #endregion

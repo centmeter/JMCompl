@@ -20,10 +20,14 @@ public class Main : MonoBehaviour
 
     private void Awake()
     {
+        Loom.Initialize();
+
         JMCameraManager.Instance.Initialize(() =>
         {
             _initDone = true;
         });
+
+
     }
 
     private void OnGUI()
@@ -51,7 +55,7 @@ public class Main : MonoBehaviour
             {
                 _camera.Open((int)_img.rectTransform.rect.width, (int)_img.rectTransform.rect.height);
 
-                Debug.Log(_camera.CamInfo);
+                Debug.Log(_camera);
             }
         }
 
@@ -73,42 +77,67 @@ public class Main : MonoBehaviour
 
         if (GUILayout.Button("拍照"))
         {
-
             if (_camera != null)
             {
                 _camera.Snapshot((tex) =>
                 {
-                    _imgSnapshot.texture = tex;
-
                     byte[] pngData = tex.EncodeToPNG();
 
                     string originPath = @"D:\1.png";
 
-                    string outputPath1 = @"D:\2.png";
-
-                    string outputPath2 = @"D:\3.png";
-
                     File.WriteAllBytes(originPath, pngData);
 
-                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-
-                    sw.Start();
-
-                    using (JMImageProcessor imageProcessor = new JMImageProcessor(originPath))
+                    System.Threading.ThreadPool.QueueUserWorkItem((state) =>
                     {
-                        imageProcessor.NegativeEffect(outputPath1, System.Drawing.Imaging.ImageFormat.Png, (res) => { Debug.Log(res+" 1"); });
+                        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
-                        imageProcessor.ReliefEffect(outputPath2, System.Drawing.Imaging.ImageFormat.Png, (res) => { Debug.Log(res+" 2"); });
-                    }
+                        sw.Start();
 
-                    sw.Stop();
+                        using (JMImageProcessor imageProcessor = new JMImageProcessor(originPath))
+                        {
+                            imageProcessor.ReliefEffect(System.Drawing.Imaging.ImageFormat.Png, (datas) =>
+                            {
+                                SetTexture(datas);
+                            });
 
-                    Debug.Log(sw.ElapsedMilliseconds);
+                            //imageProcessor.NegativeEffect(System.Drawing.Imaging.ImageFormat.Jpeg, (datas) =>
+                            //{
+                            //    SetTexture(datas);
+                            //});
+                        }
 
+                        sw.Stop();
+
+                        Debug.Log(sw.ElapsedMilliseconds);
+                    });
                 });
             }
         }
 
         GUILayout.EndVertical();
+    }
+
+    private void SetTexture(byte[] datas)
+    {
+        if (datas != null)
+        {
+            Loom.QueueOnMainThread(() =>
+            {
+                try
+                {
+                    Texture2D texture = new Texture2D((int)_img.rectTransform.rect.width, (int)_img.rectTransform.rect.height);
+
+                    texture.LoadImage(datas);
+
+                    texture.Apply();
+
+                    _imgSnapshot.texture = texture;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
+            });
+        }
     }
 }

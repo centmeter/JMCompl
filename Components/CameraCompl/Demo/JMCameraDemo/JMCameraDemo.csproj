@@ -224,6 +224,9 @@
     <Reference Include="JMCamera">
       <HintPath>Assets/Plugins/JMCamera.dll</HintPath>
     </Reference>
+    <Reference Include="JMImageTool">
+      <HintPath>Assets/Plugins/JMImageTool.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing">
       <HintPath>Assets/Plugins/System.Drawing.dll</HintPath>
     </Reference>
@@ -236,11 +239,9 @@
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/centm/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
-    <Reference Include="JMImageTool">
-      <HintPath>Assets/Plugins/JMImageTool.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Loom.cs" />
     <Compile Include="Assets\Scripts\Main.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

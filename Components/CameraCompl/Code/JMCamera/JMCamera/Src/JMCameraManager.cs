@@ -23,16 +23,15 @@ namespace JM.Camera
                     {
                         if (_instance == null)
                         {
-                            JMCameraManager[] jMCameras = FindObjectsOfType<JMCameraManager>();
+                            JMCameraManager[] instances = FindObjectsOfType<JMCameraManager>();
 
-                            if (jMCameras != null && jMCameras.Length > 0)
+                            if (instances != null && instances.Length > 0)
                             {
-                                _instance = jMCameras[0];
-
-                                if (jMCameras.Length > 1)
-                                {
-                                    Debug.LogError("## JM Error ## Cls:JMCameraManager Func:Instance Info:JMCameraController is not singleton");
-                                }
+                                _instance = instances[0];
+                            }
+                            else if (instances != null && instances.Length > 1)
+                            {
+                                Debug.LogError("## JM Error ## Cls:JMCameraManager Func:Instance Info:Have more than one instance.Return null");
                             }
                             else
                             {
@@ -45,6 +44,11 @@ namespace JM.Camera
             }
         }
 
+        private JMCameraManager()
+        {
+
+        }
+
         #endregion
 
         #region Variable
@@ -52,12 +56,47 @@ namespace JM.Camera
         /// <summary>
         /// 摄像头字典
         /// </summary>
-        private Dictionary<int, JMCamera> _cameraDic;
+        private Dictionary<int, JMCamera> _cameraDic = new Dictionary<int, JMCamera>();
 
         /// <summary>
         /// 初始化标识
         /// </summary>
         private bool _initDone = false;
+
+        #endregion
+
+        #region Property
+
+        /// <summary>
+        /// 设备数
+        /// </summary>
+        public int DeviceCount
+        {
+            get
+            {
+                return WebCamTexture.devices.Length;
+            }
+        }
+
+        /// <summary>
+        /// 设备名集合
+        /// </summary>
+        public string[] DeviceNames
+        {
+            get
+            {
+                WebCamDevice[] devices = WebCamTexture.devices;
+
+                string[] res = new string[devices.Length];
+
+                for (int i = 0; i < devices.Length; i++)
+                {
+                    res[i] = devices[i].name;
+                }
+
+                return res;
+            }
+        }
 
         #endregion
 
@@ -68,8 +107,6 @@ namespace JM.Camera
         /// </summary>
         public void Initialize(Action callback = null)
         {
-            _cameraDic = new Dictionary<int, JMCamera>();
-
             StartCoroutine(AsyncAuthorize((success) =>
            {
                _initDone = true;
@@ -124,7 +161,7 @@ namespace JM.Camera
         private IEnumerator AsyncAuthorize(Action<bool> callback = null)
         {
             yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
-            
+
             bool success = Application.HasUserAuthorization(UserAuthorization.WebCam);
 
             if (callback != null)
