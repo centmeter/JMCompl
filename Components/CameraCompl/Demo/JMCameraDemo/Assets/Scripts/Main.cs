@@ -79,13 +79,9 @@ public class Main : MonoBehaviour
         {
             if (_camera != null)
             {
-                _camera.Snapshot((tex) =>
+                _camera.Snapshot((Color32[] colors) =>
                 {
-                    byte[] pngData = tex.EncodeToPNG();
-
-                    string originPath = @"D:\1.png";
-
-                    File.WriteAllBytes(originPath, pngData);
+                    System.Drawing.Color[,] resColors = GetColors(colors, (int)_img.rectTransform.rect.width, (int)_img.rectTransform.rect.height);
 
                     System.Threading.ThreadPool.QueueUserWorkItem((state) =>
                     {
@@ -93,18 +89,16 @@ public class Main : MonoBehaviour
 
                         sw.Start();
 
-                        using (JMImageProcessor imageProcessor = new JMImageProcessor(originPath))
-                        {
-                            imageProcessor.ReliefEffect(System.Drawing.Imaging.ImageFormat.Png, (datas) =>
-                            {
-                                SetTexture(datas);
-                            });
+                        JMColorsHandler handler = new JMColorsHandler(resColors);
 
-                            //imageProcessor.NegativeEffect(System.Drawing.Imaging.ImageFormat.Jpeg, (datas) =>
-                            //{
-                            //    SetTexture(datas);
-                            //});
-                        }
+                        handler.Effect(JMImageEffect.Negative, System.Drawing.Imaging.ImageFormat.Png, (datas) =>
+                         {
+                             Loom.QueueOnMainThread(() =>
+                             {
+                                 SetTexture(datas);
+                             });
+
+                         });
 
                         sw.Stop();
 
@@ -139,5 +133,32 @@ public class Main : MonoBehaviour
                 }
             });
         }
+    }
+
+    private System.Drawing.Color[,] GetColors(Color32[] colors, int width, int height)
+    {
+        System.Drawing.Color[,] res = null;
+
+        if (colors != null && colors.Length == width * height)
+        {
+            res = new System.Drawing.Color[width, height];
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    Color32 color32 = colors[i + width * j];
+
+                    res[i, height - j - 1] = System.Drawing.Color.FromArgb(color32.a, color32.r, color32.g, color32.b);
+                }
+            }
+
+        }
+        else
+        {
+            Debug.LogError("Colors input wrong");
+        }
+
+        return res;
     }
 }

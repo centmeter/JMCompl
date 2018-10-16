@@ -41,7 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Src\JMImageProcessor.cs" />
+    <Compile Include="Src\Interface\IJMEffect.cs" />
+    <Compile Include="Src\Handler\JMBitmapHandler.cs" />
+    <Compile Include="Src\Handler\JMColorsHandler.cs" />
+    <Compile Include="Src\Utility\BitmapConvert.cs" />
+    <Compile Include="Src\Utility\CoreUtility.cs" />
+    <Compile Include="Src\Utility\FileUtility.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
