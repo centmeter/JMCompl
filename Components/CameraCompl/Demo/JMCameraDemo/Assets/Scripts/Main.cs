@@ -91,7 +91,7 @@ public class Main : MonoBehaviour
 
                         JMColorsHandler handler = new JMColorsHandler(resColors);
 
-                        handler.Effect(JMImageEffect.Negative, System.Drawing.Imaging.ImageFormat.Png, (datas) =>
+                        handler.Effect(JMImageEffect.Relief, System.Drawing.Imaging.ImageFormat.Png, (datas) =>
                          {
                              Loom.QueueOnMainThread(() =>
                              {
