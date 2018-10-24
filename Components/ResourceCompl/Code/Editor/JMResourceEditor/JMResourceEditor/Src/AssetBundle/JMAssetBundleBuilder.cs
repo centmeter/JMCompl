@@ -5,7 +5,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace JMEditor.Resource.AssetBundle
+namespace JMEditor.Resource.AssetBundles
 {
     internal static class JMAssetBundleBuilder
     {

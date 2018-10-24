@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace JMEditor.Resource.AssetBundle
+namespace JMEditor.Resource.AssetBundles
 {
     internal class JMAssetBundleSettingView : EditorWindow, IEditorView
     {

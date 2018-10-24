@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace JMEditor.Resource.AssetBundle
+namespace JMEditor.Resource.AssetBundles
 {
     internal class JMAssetBundleSettingModel : IEditorModel
     {
